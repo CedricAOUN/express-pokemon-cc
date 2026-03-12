@@ -1,7 +1,14 @@
 import express from 'express';
 import morgan from 'morgan';
-import { pokemonList } from './db.js';
 import { success, getUniqueId } from './helper.js';
+import dotenv from 'dotenv';
+import { initDb, Pokemon } from './sequelize.js';
+import { pokemonList } from './db.js';
+import * as pokemonRoutes from './routes/findAllPokemons.js';
+
+dotenv.config();
+
+initDb();
 
 const app = express();
 const port = 3000;
@@ -19,10 +26,8 @@ app.get('/', (req, res) => {
   res.send('Hello, Pokemon!');
 });
 
-app.get('/api/pokemons', (req, res) => {
-  console.log(`nombre de pokemon dans notre db ${pokemonList.length}`);
-  res.status(200).json(success(`nombre de pokemon = ${pokemonList.length}`, pokemonList));
-});
+// Routes 
+pokemonRoutes.findAllPokemons(app);
 
 app.get('/api/pokemons/:id', (req, res) => {
   const id = parseInt(req.params.id);
@@ -31,13 +36,6 @@ app.get('/api/pokemons/:id', (req, res) => {
   res.json(success(message, pokemon));
 });
 
-app.post('/api/pokemons', (req, res) => {
-  const id = getUniqueId(pokemonList);
-  const pokemonCreated = { ...req.body, ...{ id: id, created: new Date() } };
-  pokemonList.push(pokemonCreated);
-  const message = `Le pokemon ${pokemonCreated.name} a bien été créé.`;
-  res.json(success(message, pokemonCreated));
-});
 
 app.put('/api/pokemon/:id', (req, res) => {
   const id = parseInt(req.params.id);
