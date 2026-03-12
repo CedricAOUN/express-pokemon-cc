@@ -1,10 +1,8 @@
 import express from 'express';
 import morgan from 'morgan';
-import { success, getUniqueId } from './helper.js';
 import dotenv from 'dotenv';
-import { initDb, Pokemon } from './sequelize.js';
-import { pokemonList } from './db.js';
-import * as pokemonRoutes from './routes/findAllPokemons.js';
+import { initDb } from './sequelize.js';
+import * as pokemonsRoutes from './routes/pokemons-routes.js';
 
 dotenv.config();
 
@@ -26,23 +24,15 @@ app.get('/', (req, res) => {
   res.send('Hello, Pokemon!');
 });
 
-// Routes 
-pokemonRoutes.findAllPokemons(app);
+pokemonsRoutes.findAllPokemons(app);
+pokemonsRoutes.createPokemon(app);
+pokemonsRoutes.findPokemonByPk(app);
+pokemonsRoutes.updatePokemon(app);
+pokemonsRoutes.deletePokemon(app);
 
-app.get('/api/pokemons/:id', (req, res) => {
-  const id = parseInt(req.params.id);
-  const pokemon = pokemonList.find(p => p.id === parseInt(id));
-  const message = "Un pokemon a bien été trouvé";
-  res.json(success(message, pokemon));
-});
-
-
-app.put('/api/pokemon/:id', (req, res) => {
-  const id = parseInt(req.params.id);
-  const pokemonUpdated = { ...req.body, id: id };
-  pokemonList[id] = pokemonUpdated;
-  const message = `Le pokemon ${pokemonUpdated.name} a bien été modifié.`;
-  res.json(success(message, pokemonUpdated));
+app.use((req, res) => {
+  const message = "Impossible de trouver la ressource demandée !";
+  res.status(404).json({ message });
 });
 
 app.listen(port, () => {
