@@ -3,6 +3,8 @@ import morgan from 'morgan';
 import dotenv from 'dotenv';
 import { initDb } from './sequelize.js';
 import * as pokemonsRoutes from './routes/pokemons-routes.js';
+import * as usersRoutes from './routes/users-routes.js';
+import authMdlr from './auth/auth.js';
 
 dotenv.config();
 
@@ -23,6 +25,10 @@ app.use(express.json());
 app.get('/', (req, res) => {
   res.send('Hello, Pokemon!');
 });
+
+usersRoutes.userLogin(app);
+
+app.use(authMdlr);
 
 pokemonsRoutes.findAllPokemons(app);
 pokemonsRoutes.createPokemon(app);

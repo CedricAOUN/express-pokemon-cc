@@ -1,0 +1,1 @@
+export const private_key = 'CUSTOM PRIVATE_KEY';
